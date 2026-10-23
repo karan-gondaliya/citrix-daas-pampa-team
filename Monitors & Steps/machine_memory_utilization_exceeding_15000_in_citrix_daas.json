@@ -1,0 +1,26 @@
+{
+    "id": 333269450,
+    "name": "Machine Memory Utilization Exceeding 15000 in Citrix DaaS",
+    "type": "log alert",
+    "query": "logs(\"source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary\").index(\"*\").rollup(\"avg\", \"@AvgUsedMemory\").by(\"@cds.citrix_daas.machine.name\").last(\"1d\") > 15000",
+    "message": "The average memory utilization for the machine **{{log.attributes.cds.citrix_daas.machine.name}}** has exceeded the configured threshold of **{{threshold}}**MB.\r\n\r\n**Machine Details**\r\n\r\n- **Machine Name**: {{log.attributes.cds.citrix_daas.machine.name}}\r\n- **Machine IP**: {{log.attributes.cds.citrix_daas.machine.ip}}\r\n- **Desktop Group**: {{log.attributes.cds.citrix_daas.desktop_group.name}}\r\n- **Avg Memory Utilization** : {{log.attributes.AvgUsedMemory}}\r\n\r\nSustained high memory utilization may impact machine performance, application responsiveness, and user session stability. Please investigate potential causes such as excessive application memory consumption, resource-intensive workloads, or insufficient system resources affecting this machine.",
+    "tags": [
+        "integration:crest-data-systems-citrix-daas",
+        "stack_component:cds.citrix_daas.machines"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 15000,
+            "warning": 12000
+        },
+        "enable_logs_sample": true,
+        "notify_audit": false,
+        "on_missing_data": "default",
+        "include_tags": true,
+        "new_group_delay": 60,
+        "groupby_simple_monitor": false
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

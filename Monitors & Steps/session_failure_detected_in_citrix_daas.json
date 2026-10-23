@@ -1,0 +1,25 @@
+{
+    "id": 333269712,
+    "name": "Session Failure Detected in Citrix DaaS",
+    "type": "log alert",
+    "query": "logs(\"source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0\").index(\"*\").rollup(\"count\").last(\"1h\") > 0",
+    "message": "The session failure Detected in the Citrix DaaS environment.\r\n\r\n**Session Details*\r\n\r\n- **Session Key**: {{log.attributes.cds.citrix_daas.session.key}}\r\n- **Machine Name**: {{log.attributes.cds.citrix_daas.machine.name}}\r\n- **Machine IP**: {{log.attributes.cds.citrix_daas.machine.ip}}\r\n- **User**: {{log.attributes.usr.name}}\r\n- **Exit Code**: {{log.attributes.ExitCode}}\r\n- **Failure Date**: {{log.attributes.FailureDate}}\r\n- **CreatedDate**: {{log.attributes.@CreatedDate}}\r\n\r\nAn elevated session failure rate may prevent users from successfully launching or reconnecting to sessions. Please investigate potential causes such as machine availability issues, broker communication failures, authentication problems, or resource constraints affecting the Citrix DaaS environment.",
+    "tags": [
+        "integration:crest-data-systems-citrix-daas",
+        "stack_component:cds.citrix_daas.sessions"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 0
+        },
+        "enable_logs_sample": false,
+        "notify_audit": false,
+        "on_missing_data": "default",
+        "include_tags": false,
+        "groupby_simple_monitor": false,
+        "new_host_delay": 300
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

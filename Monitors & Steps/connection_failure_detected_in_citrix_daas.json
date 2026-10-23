@@ -1,0 +1,25 @@
+{
+    "id": 335633953,
+    "name": "Connection Failure Detected in Citrix DaaS",
+    "type": "log alert",
+    "query": "logs(\"source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* -@cds.citrix_daas.connection.failure_type:None -@cds.citrix_daas.connection.failure_type:Unknown\").index(\"*\").rollup(\"count\").by(\"@cds.citrix_daas.session.key\").last(\"5m\") > 0",
+    "message": "A connection failure has been detected in the Citrix DaaS environment.\r\n\r\n**Failure Details**\r\n\r\n- **Session Key**: {{log.attributes.cds.citrix_daas.session.key}}\r\n- **Machine Name**: {{log.attributes.cds.citrix_daas.machine.name}}\r\n- **Machine IP**: {{log.attributes.cds.citrix_daas.machine.ip}}\r\n- **User**: {{log.attributes.usr.name}}\r\n- **Failure Reason**: {{log.attributes.cds.citrix_daas.connection.failure_type}}\r\n- **Created Time**: {{log.attributes.ConnectionFailureLog.CreatedDate}}\r\n- **Failure Time**: {{log.attributes.ConnectionFailureLog.FailureDate}} \r\n- **ClientLocationCity**: {{log.attributes.ClientLocationCity}}\r\n- **ClientLocationCountry**: {{log.attributes.ClientLocationCountry}}\r\n\r\n\r\nThis may prevent the user from launching or reconnecting to their session. Please investigate machine availability, licensing, network connectivity, or configuration issues affecting this session/machine.",
+    "tags": [
+        "integration:crest-data-systems-citrix-daas",
+        "stack_component:cds.citrix_daas.connections"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 0
+        },
+        "enable_logs_sample": true,
+        "notify_audit": false,
+        "on_missing_data": "resolve",
+        "include_tags": true,
+        "new_group_delay": 60,
+        "groupby_simple_monitor": false
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

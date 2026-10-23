@@ -1,0 +1,2544 @@
+{
+    "title": " Citrix DaaS - Connection & Sessions",
+    "description": "End-to-end Citrix DaaS flow dashboard: connection failures and reasons, connection/session performance degradation, and application connection and underlying machine performance, correlated from connection through session to the hosting machine.",
+    "widgets": [
+        {
+            "id": 9400000000000004,
+            "definition": {
+                "title": "About This Dashboard",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9400000000000000,
+                        "definition": {
+                            "type": "image",
+                            "url": "https://docs.crestdata.ai/datadog-integrations-logos/citrix_daas-light.svg",
+                            "url_dark_theme": "https://docs.crestdata.ai/datadog-integrations-logos/citrix_daas-dark.svg",
+                            "sizing": "fill",
+                            "has_background": false,
+                            "has_border": false,
+                            "vertical_align": "center",
+                            "horizontal_align": "center"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 4,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9400000000000002,
+                        "definition": {
+                            "type": "note",
+                            "content": "### Overview\nThis dashboard consolidates connection failures and their reasons, session/connection performance degradation, and application connection and underlying machine performance into a single view.\n\n### Tips\n- Use the timeframe selector in the top right to change the default timeframe.\n- Use template variables to filter by machine, user, desktop group, connection, session, failure type, application, or tenant.\n- Clone this dashboard to rearrange, modify, and add widgets.",
+                            "background_color": "gray",
+                            "font_size": "14",
+                            "text_align": "left",
+                            "vertical_align": "top",
+                            "show_tick": false,
+                            "tick_pos": "50%",
+                            "tick_edge": "left",
+                            "has_padding": true
+                        },
+                        "layout": {
+                            "x": 4,
+                            "y": 0,
+                            "width": 4,
+                            "height": 3
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 0,
+                "width": 8,
+                "height": 4
+            }
+        },
+        {
+            "id": 8178071112066856,
+            "definition": {
+                "type": "note",
+                "content": "## Widgets\n  1. Total Connections\n  2. Total Sessions\n  3. Connection Failure Rate\n  4. Session Failure Rate\n  5. Connections vs Sessions Over Time\n  6. Total Connection Failures\n  7. Connection Failures Over Time by Failure Type\n  8. Unencrypted (Non-Secure ICA) Connections\n  9. Connection Failures by Type\n  10. Top Machines by Connection Failures\n  11. Top Users Affected by Connection Failures\n  12. Total Failed Sessions\n  13. Session Failures Over Time by Type\n  14. Anonymous Sessions\n  15. Top Machines by Session Failure Rate\n  16. Top Affected Users by Failed Sessions\n  17. Avg Logon Duration\n  18. Avg Authentication Duration\n  19. Avg ICA Round Trip Time\n  20. Avg Session Duration\n  21. Logon Duration Over Time (Avg)\n  22. Authentication Duration Over Time\n  23. ICA Round Trip Time Trend\n  24. Client vs Server Latency per Machine\n  25. Connection Details\n  26. Session Details",
+                "background_color": "gray",
+                "font_size": "14",
+                "text_align": "left",
+                "vertical_align": "top",
+                "show_tick": false,
+                "tick_pos": "50%",
+                "tick_edge": "left",
+                "has_padding": true
+            },
+            "layout": {
+                "x": 8,
+                "y": 0,
+                "width": 4,
+                "height": 4
+            }
+        },
+        {
+            "id": 6968399804414720,
+            "definition": {
+                "title": "Monitors",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 3268809702155946,
+                        "definition": {
+                            "title": "Monitor Summary",
+                            "type": "manage_status",
+                            "display_format": "countsAndList",
+                            "color_preference": "text",
+                            "hide_zero_counts": true,
+                            "show_status": true,
+                            "last_triggered_format": "relative",
+                            "query": "tag:(stack_component:cds.citrix_daas.connections OR stack_component:cds.citrix_daas.sessions)",
+                            "sort": "status,asc",
+                            "count": 50,
+                            "start": 0,
+                            "summary_type": "monitors",
+                            "show_priority": false,
+                            "show_last_triggered": false,
+                            "show_investigation": false
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 12,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 4,
+                "width": 12,
+                "height": 5
+            }
+        },
+        {
+            "id": 9400000000000012,
+            "definition": {
+                "title": "Overview",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9400000000000008,
+                        "definition": {
+                            "title": "Total Connections",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Total number of connection attempts in the selected timeframe — the entry point of the Citrix DaaS flow.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d4edf2"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 5984531773084318,
+                        "definition": {
+                            "title": "Total Sessions",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Total number of sessions created from those connections — one connection can carry multiple sessions.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d4edf2"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 7629307697669810,
+                        "definition": {
+                            "title": "Connection Failure Rate",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Percentage of connections that resulted in an active failure (excludes None/Unknown). Green <5%, yellow 5-10%, red ≥10%.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero((q_fail / q_total) * 100)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "q_fail",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* -@cds.citrix_daas.connection.failure_type:(None OR Unknown) $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "count"
+                                            },
+                                            "storage": "hot"
+                                        },
+                                        {
+                                            "name": "q_total",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "count"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 10,
+                                            "palette": "black_on_light_red"
+                                        },
+                                        {
+                                            "comparator": ">=",
+                                            "value": 5,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "<",
+                                            "value": 5,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9400000000000010,
+                        "definition": {
+                            "title": "Session Failure Rate",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Percentage of sessions that ended with a non-zero exit code. Green <5%, yellow 5-10%, red ≥10%.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero((q_fail / q_total) * 100)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "q_fail",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        },
+                                        {
+                                            "name": "q_total",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 10,
+                                            "palette": "black_on_light_red"
+                                        },
+                                        {
+                                            "comparator": ">=",
+                                            "value": 5,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "<",
+                                            "value": 5,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 9,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 9,
+                "width": 12,
+                "height": 1
+            }
+        },
+        {
+            "id": 9400000000000022,
+            "definition": {
+                "title": "Connection Failures & Reasons",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 5264320546488589,
+                        "definition": {
+                            "title": "Total Connection Failures",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Count of connections with an active failure type (excludes None and Unknown). Non-zero values warrant investigation.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "black_on_light_red"
+                                        },
+                                        {
+                                            "comparator": "=",
+                                            "value": 0,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 3,
+                            "height": 2
+                        }
+                    },
+                    {
+                        "id": 4778481897282827,
+                        "definition": {
+                            "title": "Connection Failures Over Time ",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Trend of connection failures broken down by named failure type (from @cds.citrix_daas.connection.failure_type). Correlate spikes with infrastructure events or maintenance windows.",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "response_format": "timeseries",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* -@cds.citrix_daas.connection.failure_type:(None OR Unknown) $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": {
+                                                "fields": [],
+                                                "limit": 15,
+                                                "sort": {
+                                                    "aggregation": "count",
+                                                    "metric": "count",
+                                                    "order": "desc"
+                                                },
+                                                "should_exclude_missing": true
+                                            },
+                                            "compute": {
+                                                "aggregation": "count",
+                                                "interval": 1200000
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "custom_unit_label",
+                                                    "label": "Failures"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "style": {
+                                        "palette": "dog_classic",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 0,
+                            "width": 9,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 5586787138385254,
+                        "definition": {
+                            "title": "Unencrypted (Non-Secure ICA) Connections",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Connections established without ICA encryption. A security and reliability risk on untrusted networks.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @IsSecureIca:false $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "=",
+                                            "value": 0,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 2,
+                            "width": 3,
+                            "height": 2
+                        }
+                    },
+                    {
+                        "id": 9400000000000018,
+                        "definition": {
+                            "title": "Connection Failures by Type",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Distribution of connection failures across named failure types — pinpoints the dominant root cause.",
+                            "requests": [
+                                {
+                                    "response_format": "scalar",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.connection.failure_type",
+                                                    "limit": 15,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.connection.id"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "formula": "query1"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "type": "sunburst",
+                            "hide_total": false,
+                            "legend": {
+                                "type": "table"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 4,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 9400000000000020,
+                        "definition": {
+                            "title": "Top Machines by Connection Failures",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Machines with the highest connection failure count. Persistent presence indicates a VDA-level problem requiring targeted remediation.",
+                            "type": "toplist",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.connection.id"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "custom_unit_label",
+                                                    "label": "Failures"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 10,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "style": {
+                                "display": {
+                                    "type": "stacked",
+                                    "legend": "automatic"
+                                },
+                                "palette": "warm"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 8,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 4952320153161830,
+                        "definition": {
+                            "title": "Top Users Affected by Connection Failures",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Users experiencing the most connection failures. High repeat counts suggest a client-side or profile-level issue.",
+                            "type": "toplist",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections @cds.citrix_daas.connection.failure_type:* $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@usr.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.connection.id"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.connection.id"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "custom_unit_label",
+                                                    "label": "Failures"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 10,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "style": {
+                                "display": {
+                                    "type": "stacked",
+                                    "legend": "automatic"
+                                },
+                                "palette": "warm"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 8,
+                            "width": 6,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 10,
+                "width": 12,
+                "height": 1
+            }
+        },
+        {
+            "id": 9400000000000032,
+            "definition": {
+                "title": "Session Failures & Reasons",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9400000000000024,
+                        "definition": {
+                            "title": "Total Failed Sessions",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Sessions that ended with a non-zero exit code in the selected timeframe.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "black_on_light_red"
+                                        },
+                                        {
+                                            "comparator": "=",
+                                            "value": 0,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 3,
+                            "height": 2
+                        }
+                    },
+                    {
+                        "id": 9400000000000026,
+                        "definition": {
+                            "title": "Session Failures Over Time ",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Trend of failed sessions grouped by failure type (same failure taxonomy as connections) — reveals spikes and recurring failure patterns.",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "response_format": "timeseries",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "compute": {
+                                                "aggregation": "count",
+                                                "interval": 1200000
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "alias": "Failed Sessions",
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "style": {
+                                        "palette": "warm",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 0,
+                            "width": 9,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 4375212329553582,
+                        "definition": {
+                            "title": "Anonymous Sessions",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Sessions launched without an authenticated user identity.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @IsAnonymous:true $Machine_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": "=",
+                                            "value": 0,
+                                            "palette": "black_on_light_green"
+                                        },
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "black_on_light_yellow"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 2,
+                            "width": 3,
+                            "height": 2
+                        }
+                    },
+                    {
+                        "id": 7590871291919929,
+                        "definition": {
+                            "title": "Top Machines by Session Failure Rate",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Ranks machines by failure rate (failed / total sessions) — pinpoints machines with systemic session issues for targeted remediation.",
+                            "type": "query_table",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "name": "query4",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.session.key"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        },
+                                        {
+                                            "name": "query5",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.session.key"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        },
+                                        {
+                                            "name": "q_failed",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.session.key"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        },
+                                        {
+                                            "name": "q_total",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.session.key"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "cell_display_mode": "bar",
+                                            "alias": "Failed Sessions",
+                                            "formula": "default_zero(query4)"
+                                        },
+                                        {
+                                            "alias": "Total Sessions",
+                                            "formula": "default_zero(query5)"
+                                        },
+                                        {
+                                            "alias": "Failure Rate (%)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "default_zero((q_failed / q_total) * 100)"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 15,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "has_search_bar": "auto"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 4,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 9400000000000030,
+                        "definition": {
+                            "title": "Top Affected Users by Failed Sessions",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Identifies users experiencing the most session failures — prioritizes user-facing escalations and helpdesk triage.",
+                            "type": "toplist",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @ExitCode:>0 $Machine_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@usr.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "cardinality",
+                                                        "order": "desc",
+                                                        "metric": "@cds.citrix_daas.session.key"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@cds.citrix_daas.session.key"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "custom_unit_label",
+                                                    "label": "Failures"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 10,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "style": {
+                                "display": {
+                                    "type": "stacked",
+                                    "legend": "automatic"
+                                },
+                                "palette": "warm"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 4,
+                            "width": 6,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 11,
+                "width": 12,
+                "height": 1
+            }
+        },
+        {
+            "id": 9400000000000042,
+            "definition": {
+                "title": "Connection & Session Performance ",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 3333186644062520,
+                        "definition": {
+                            "title": "Avg Logon Duration",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average time (connection logon) users wait before a connection is established.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "second"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@cds.citrix_daas.connection.logon_duration"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 10,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "<",
+                                            "value": 10,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 5875415042664488,
+                        "definition": {
+                            "title": "Avg Authentication Duration",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average time spent authenticating during connection logon.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@AuthenticationDuration"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 10,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "<=",
+                                            "value": 10,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9400000000000034,
+                        "definition": {
+                            "title": "Avg ICA Round Trip Time",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average round-trip time of the ICA protocol across active sessions — the primary indicator of interactive responsiveness.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@IcaRttMS"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Failure_Type"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.session.key",
+                                                        "limit": 10000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.session.key",
+                                                    "filter_attribute": "@cds.citrix_daas.session.key",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 10,
+                                            "palette": "black_on_light_yellow"
+                                        },
+                                        {
+                                            "comparator": "<=",
+                                            "value": 10,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9400000000000036,
+                        "definition": {
+                            "title": "Avg Session Duration",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average session completion time across all sessions in scope.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@cds.citrix_daas.session.completion_time"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#c0edf2"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 0,
+                            "timeseries_background": {
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 9,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 1647072974838944,
+                        "definition": {
+                            "title": "Logon Duration Over Time (Avg)",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Overall connection logon performance trend — sustained increases indicate broker, VDA, or infrastructure degradation.",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "response_format": "timeseries",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@cds.citrix_daas.connection.logon_duration",
+                                                "interval": 60000
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "alias": "Avg Logon Duration",
+                                            "formula": "query1",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "style": {
+                                        "palette": "purple",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 3,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 9400000000000038,
+                        "definition": {
+                            "title": "Authentication Duration Over Time",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Trend of connection authentication time — sustained increases point to identity provider or broker latency.",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "response_format": "timeseries",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@AuthenticationDuration",
+                                                "interval": 60000
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "alias": "Avg Authentication Duration",
+                                            "formula": "query1",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "style": {
+                                        "palette": "cool",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ],
+                            "markers": [
+                                {
+                                    "label": "5000ms warning",
+                                    "value": "y = 5000",
+                                    "display_type": "warning dashed"
+                                },
+                                {
+                                    "label": "10000ms critical",
+                                    "value": "y = 10000",
+                                    "display_type": "error dashed"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 3,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 4698047495480155,
+                        "definition": {
+                            "title": "ICA Round Trip Time Trend",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "ICA RTT trend across sessions, with warning/critical thresholds matching the shipped RTT monitor.",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "response_format": "timeseries",
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@IcaRttMS",
+                                                    "interval": 60000
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Failure_Type"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.session.key",
+                                                        "limit": 10000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.session.key",
+                                                    "filter_attribute": "@cds.citrix_daas.session.key",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "alias": "Avg ICA RTT",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "style": {
+                                        "palette": "purple",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ],
+                            "markers": [
+                                {
+                                    "label": "1500ms warning",
+                                    "value": "y = 1500",
+                                    "display_type": "warning dashed"
+                                },
+                                {
+                                    "label": "3000ms critical",
+                                    "value": "y = 3000",
+                                    "display_type": "error dashed"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 7,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 4130415656200877,
+                        "definition": {
+                            "title": "Client vs Server Latency per Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Per-machine client latency, server latency, and ICA RTT side by side — isolates whether degradation is network- or machine-side.",
+                            "type": "query_table",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@ClientL7Latency"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@ClientL7Latency"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_client",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Failure_Type"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.session.key",
+                                                        "limit": 10000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.session.key",
+                                                    "filter_attribute": "@cds.citrix_daas.session.key",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@ServerL7Latency"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@ClientL7Latency"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_server",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Failure_Type"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.session.key",
+                                                        "limit": 10000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.session.key",
+                                                    "filter_attribute": "@cds.citrix_daas.session.key",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@IcaRttMS"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 15,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@ClientL7Latency"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_rtt",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Failure_Type"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.session.key",
+                                                        "limit": 10000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.session.key",
+                                                    "filter_attribute": "@cds.citrix_daas.session.key",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "cell_display_mode": "bar",
+                                            "alias": "Client Latency (ms)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_client"
+                                        },
+                                        {
+                                            "cell_display_mode": "bar",
+                                            "alias": "Server Latency (ms)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_server"
+                                        },
+                                        {
+                                            "alias": "ICA RTT (ms)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_rtt"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 15,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "has_search_bar": "auto"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 11,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 6548540310213534,
+                        "definition": {
+                            "title": "Avg CPU Utilization Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "CPU utilization trend for the top machines running the selected application.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Avg CPU Usage",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary $Machine_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@AvgPercentCpu"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "dog_classic",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ],
+                            "markers": [
+                                {
+                                    "label": " CPU Saturation ",
+                                    "value": "y = 80",
+                                    "display_type": "error dashed"
+                                },
+                                {
+                                    "label": " Underutilized ",
+                                    "value": "y = 20",
+                                    "display_type": "warning dashed"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 15,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 517684614586398,
+                        "definition": {
+                            "title": "Avg Memory Usage Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Used memory as a percentage of total memory over time for the top machines running the selected application.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "q_used"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "q_used",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary $Machine_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgUsedMemory"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@AvgUsedMemory"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "cool",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 15,
+                            "width": 6,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 12,
+                "width": 12,
+                "height": 20
+            }
+        },
+        {
+            "id": 7105138979896512,
+            "definition": {
+                "title": "Session Details",
+                "title_size": "16",
+                "title_align": "left",
+                "requests": [
+                    {
+                        "response_format": "event_list",
+                        "query": {
+                            "data_source": "logs_stream",
+                            "query_string": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions $Machine_Name $User_Name $Failure_Type",
+                            "indexes": [],
+                            "storage": "hot"
+                        },
+                        "columns": [
+                            {
+                                "field": "timestamp",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.machine.name",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@usr.name",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.session.type",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.session.connection_state",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.connection.failure_type",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.session.life_cycle_state",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.desktop_group.name",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "LogOnDuration",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.session.completion_time",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "SessionIdleTime",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ExitCode",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "IsAnonymous",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.machine.current_power_state",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.machine.fault_state",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "StartDate",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "EndDate",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.session.key",
+                                "width": "auto"
+                            }
+                        ]
+                    }
+                ],
+                "type": "list_stream"
+            },
+            "layout": {
+                "x": 0,
+                "y": 32,
+                "width": 12,
+                "height": 4
+            }
+        },
+        {
+            "id": 2060378544069699,
+            "definition": {
+                "title": "Connection Details",
+                "title_size": "16",
+                "title_align": "left",
+                "description": "Detailed view of individual connection events for investigation and troubleshooting.\n",
+                "requests": [
+                    {
+                        "response_format": "event_list",
+                        "query": {
+                            "data_source": "logs_stream",
+                            "query_string": "@cds.citrix_daas.service_name:cds.citrix_daas.connections $Machine_Name $User_Name $Failure_Type",
+                            "indexes": [],
+                            "storage": "hot"
+                        },
+                        "columns": [
+                            {
+                                "field": "usr.name",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.machine.name",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ClientPlatform",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ClientVersion",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "Protocol",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "IsSecureIca",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "IsReconnect",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "AuthenticationDuration",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "BrokeringDuration",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.connection.failure_type",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "@cds.citrix_daas.connection.logon_duration",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "DisconnectCode",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ConnectedViaHostName",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "LaunchedViaHostName",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ClientLocationCountry",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ClientISP",
+                                "width": "auto"
+                            },
+                            {
+                                "field": "ModifiedDate",
+                                "width": "auto"
+                            }
+                        ]
+                    }
+                ],
+                "type": "list_stream"
+            },
+            "layout": {
+                "x": 0,
+                "y": 36,
+                "width": 12,
+                "height": 4
+            }
+        }
+    ],
+    "template_variables": [
+        {
+            "name": "Machine_Name",
+            "prefix": "@cds.citrix_daas.machine.name",
+            "available_values": [],
+            "default": "*"
+        },
+        {
+            "name": "User_Name",
+            "prefix": "@usr.name",
+            "available_values": [],
+            "default": "*"
+        },
+        {
+            "name": "Failure_Type",
+            "prefix": "@cds.citrix_daas.connection.failure_type",
+            "available_values": [],
+            "default": "*"
+        }
+    ],
+    "layout_type": "ordered",
+    "notify_list": [],
+    "reflow_type": "fixed"
+}

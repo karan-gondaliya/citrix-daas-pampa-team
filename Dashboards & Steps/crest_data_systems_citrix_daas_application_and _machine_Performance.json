@@ -1,0 +1,2840 @@
+{
+    "title": "Citrix DaaS - Application and Machine Performance",
+    "description": "Application-centric Citrix DaaS dashboard. Filter by Application Name to narrow down every widget, including machine inventory, sessions, connections, ICA/logon performance, and CPU/memory utilization, to the machines running that application. For sources that don't have an Application Name, the dashboard uses a Machine Name join (`sub-query` / `aggregate_filtered_query`) against Application Instance logs.",
+    "widgets": [
+        {
+            "id": 9500000000000000,
+            "definition": {
+                "title": "About This Dashboard",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9500000000000002,
+                        "definition": {
+                            "type": "image",
+                            "url": "https://docs.crestdata.ai/datadog-integrations-logos/citrix_daas-light.svg",
+                            "url_dark_theme": "https://docs.crestdata.ai/datadog-integrations-logos/citrix_daas-dark.svg",
+                            "sizing": "fill",
+                            "has_background": false,
+                            "has_border": false,
+                            "vertical_align": "center",
+                            "horizontal_align": "center"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 4,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9500000000000004,
+                        "definition": {
+                            "type": "note",
+                            "content": "### Overview\n\nAn application-centric Citrix DaaS dashboard. Select an app in the `Application_Name` template variable. Every widget, including usage, sessions, ICA/logon performance, and CPU/memory, automatically filters down to the machines running the application, using a Machine Name join against Application Instance logs.\n\n### Tips\n- Use `$Application_Name` to scope the whole dashboard to one application.\n- Use `$Machine_Name` / `$User_Name` to go further into a specific VDA or user.\n- Clone this dashboard to rearrange, modify, or add widgets.",
+                            "background_color": "blue",
+                            "font_size": "14",
+                            "text_align": "left",
+                            "vertical_align": "top",
+                            "show_tick": false,
+                            "tick_pos": "50%",
+                            "tick_edge": "left",
+                            "has_padding": true
+                        },
+                        "layout": {
+                            "x": 4,
+                            "y": 0,
+                            "width": 4,
+                            "height": 3
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 0,
+                "width": 8,
+                "height": 4
+            }
+        },
+        {
+            "id": 2811281327485686,
+            "definition": {
+                "type": "note",
+                "content": "## Widgets\n1. Total Sessions\n  2. Unique Users\n  3. Total Application Launches\n  4. Avg Usage Duration per Launch\n  5. Application Instances Over Time by Machine\n  6. Application Launches Over Time\n  7. Application Instances by Geolocation\n  8. Application Instances Details\n  9. Avg CPU Utilization\n  10. Peak CPU Utilization\n  11. Machines Breaching 80% CPU\n  12. Avg Memory Utilization\n  13. Machines by Application Instance Completion Time\n  14. Peak CPU Over Time by Machine\n  15. Avg CPU Utilization Over Time by Machine\n  16. Avg Memory Usage Over Time by Machine\n  17. Average IOPS Over Time\n  18. Machine Resource Utilization Details",
+                "background_color": "gray",
+                "font_size": "16",
+                "text_align": "left",
+                "vertical_align": "top",
+                "show_tick": false,
+                "tick_pos": "50%",
+                "tick_edge": "left",
+                "has_padding": true
+            },
+            "layout": {
+                "x": 8,
+                "y": 0,
+                "width": 4,
+                "height": 4
+            }
+        },
+        {
+            "id": 7438063499401758,
+            "definition": {
+                "title": "Monitors",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 4704510009897334,
+                        "definition": {
+                            "title": "Monitor Summary",
+                            "type": "manage_status",
+                            "display_format": "countsAndList",
+                            "color_preference": "text",
+                            "hide_zero_counts": true,
+                            "show_status": true,
+                            "last_triggered_format": "relative",
+                            "query": "tag:(stack_component:cds.citrix_daas.machines)",
+                            "sort": "status,asc",
+                            "count": 50,
+                            "start": 0,
+                            "summary_type": "monitors",
+                            "show_priority": false,
+                            "show_last_triggered": false,
+                            "show_investigation": false
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 12,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 4,
+                "width": 12,
+                "height": 5
+            }
+        },
+        {
+            "id": 9500000000000012,
+            "definition": {
+                "title": "Application Overview",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9500000000000018,
+                        "definition": {
+                            "title": "Total Sessions",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Sessions recorded on machines running the selected application (sub-query joined on Machine Name).",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "cardinality",
+                                                    "metric": "@cds.citrix_daas.session.key"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 6391896951529696,
+                        "definition": {
+                            "title": "Unique Users",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Unique users who have launched the selected application.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [],
+                                            "compute": {
+                                                "aggregation": "cardinality",
+                                                "metric": "@usr.name"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "type": "area",
+                                "yaxis": {
+                                    "include_zero": true
+                                }
+                            }
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 6931880122842177,
+                        "definition": {
+                            "title": "Total Application Launches",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Total launch count for the selected application (Application Activity Summary).",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "sum",
+                                                    "metric": "@TotalLaunchesCount"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationactivitysummaries"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Machine_Name $User_Name $Application_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.application.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.application.name",
+                                                    "filter_attribute": "@cds.citrix_daas.application.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 566637257100082,
+                        "definition": {
+                            "title": "Avg Usage Duration per Launch",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Total usage duration divided by total launches for the selected application.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "second"
+                                                }
+                                            },
+                                            "formula": "default_zero(q_dur / q_lnch)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "sum",
+                                                    "metric": "@TotalUsageDuration"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "q_dur",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationactivitysummaries"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Machine_Name $User_Name $Application_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.application.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.application.name",
+                                                    "filter_attribute": "@cds.citrix_daas.application.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "sum",
+                                                    "metric": "@TotalLaunchesCount"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "q_lnch",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationactivitysummaries $Application_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Machine_Name $User_Name $Application_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.application.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.application.name",
+                                                    "filter_attribute": "@cds.citrix_daas.application.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 9,
+                            "y": 0,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9500000000000014,
+                        "definition": {
+                            "title": "Application Instances Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Instance volume trend for the selected application, broken down by the top machines running it.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Instances",
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "sort": {
+                                                        "aggregation": "count",
+                                                        "order": "desc",
+                                                        "metric": "count"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "count"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "datadog16",
+                                        "order_by": "values",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 3,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 6502599706215656,
+                        "definition": {
+                            "title": "Application Launches Over Time",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Tracks how application usage changes over time.\n",
+                            "show_legend": false,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Launches",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "custom_unit_label",
+                                                    "label": "Count"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "sum",
+                                                    "metric": "@TotalLaunchesCount"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "@cds.citrix_daas.service_name:cds.citrix_daas.applicationactivitysummaries"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Machine_Name $User_Name $Application_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.application.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.application.name",
+                                                    "filter_attribute": "@cds.citrix_daas.application.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "dog_classic",
+                                        "order_by": "values",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 7,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 1099437274055229,
+                        "definition": {
+                            "title": "Application Instances by Geolocation",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Geographic distribution of where the selected application is being accessed from.",
+                            "type": "geomap",
+                            "requests": [
+                                {
+                                    "response_format": "scalar",
+                                    "queries": [
+                                        {
+                                            "name": "query1",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@network.client.geoip.country.iso_code",
+                                                    "limit": 250,
+                                                    "sort": {
+                                                        "aggregation": "count",
+                                                        "order": "desc",
+                                                        "metric": "count"
+                                                    },
+                                                    "should_exclude_missing": true
+                                                }
+                                            ],
+                                            "compute": {
+                                                "aggregation": "count"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "formulas": [
+                                        {
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 500,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "style": {
+                                "palette": "hostmap_blues",
+                                "palette_flip": false
+                            },
+                            "view": {
+                                "focus": "WORLD"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 11,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 6577415481261831,
+                        "definition": {
+                            "title": "Application Instances Details",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Provides detailed records of individual application sessions.\n",
+                            "requests": [
+                                {
+                                    "response_format": "event_list",
+                                    "query": {
+                                        "data_source": "logs_stream",
+                                        "query_string": "@cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name",
+                                        "indexes": [],
+                                        "storage": "hot"
+                                    },
+                                    "columns": [
+                                        {
+                                            "field": "timestamp",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.machine.name",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.machine.ip",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@usr.name",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@usr.email",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.application.name",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.session.key",
+                                            "width": "auto"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "type": "list_stream"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 15,
+                            "width": 12,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 9,
+                "width": 12,
+                "height": 1
+            }
+        },
+        {
+            "id": 9500000000000048,
+            "definition": {
+                "title": "Machine Resource Utilization",
+                "background_color": "vivid_purple",
+                "show_title": true,
+                "type": "group",
+                "layout_type": "ordered",
+                "widgets": [
+                    {
+                        "id": 9500000000000046,
+                        "definition": {
+                            "title": "Resource Utilization Summary - CPU vs Logon Correlation",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Per-machine CPU, ICA RTT, logon duration, and session load side by side, for machines running the selected application.",
+                            "type": "query_table",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 200,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_avg_cpu",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "max",
+                                                    "metric": "@PeakPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 200,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "max",
+                                                        "order": "desc",
+                                                        "metric": "@PeakPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_peak_cpu",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@LogOnDuration"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 200,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_logon",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@IcaRttMS"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 200,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_ica_rtt",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessionmetrics"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "cardinality",
+                                                    "metric": "@cds.citrix_daas.session.key"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 200,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_sessions",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "sort": {
+                                        "count": 500,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    },
+                                    "formulas": [
+                                        {
+                                            "cell_display_mode": "bar",
+                                            "alias": "Avg CPU %",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "q_avg_cpu"
+                                        },
+                                        {
+                                            "alias": "Peak CPU %",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "q_peak_cpu"
+                                        },
+                                        {
+                                            "alias": "Avg Logon Duration",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_logon"
+                                        },
+                                        {
+                                            "alias": "Avg ICA RTT",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_ica_rtt"
+                                        },
+                                        {
+                                            "alias": "Total Sessions",
+                                            "formula": "q_sessions"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "has_search_bar": "auto"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 9500000000000040,
+                        "definition": {
+                            "title": "Avg CPU Utilization",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average CPU utilization on machines running the selected application.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 4,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 8222418964689011,
+                        "definition": {
+                            "title": "Peak CPU Utilization",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Peak CPU utilization on machines running the selected application.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "max",
+                                                    "metric": "@PeakPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 3,
+                            "y": 4,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 1082257473934693,
+                        "definition": {
+                            "title": "Machines Breaching 80% CPU",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Count of machines running the selected application whose peak CPU exceeded 80%.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "formula": "default_zero(query1)"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "cardinality",
+                                                    "metric": "@cds.citrix_daas.machine.id"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary @PeakPercentCpu:>80"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">",
+                                            "value": 0,
+                                            "palette": "black_on_light_red"
+                                        },
+                                        {
+                                            "comparator": "=",
+                                            "value": 0,
+                                            "palette": "black_on_light_green"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 4,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 9500000000000042,
+                        "definition": {
+                            "title": "Avg Memory Utilization",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Average used memory as a percentage of total memory on machines running the selected application.",
+                            "type": "query_value",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "default_zero(q_used) / default_zero(q_total) * 100"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgUsedMemory"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "q_used",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgTotalMemory"
+                                                }
+                                            ],
+                                            "group_by": [],
+                                            "name": "q_total",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "conditional_formats": [
+                                        {
+                                            "comparator": ">=",
+                                            "value": 0,
+                                            "palette": "custom_bg",
+                                            "custom_bg_color": "#d8edf3"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "autoscale": true,
+                            "precision": 1,
+                            "timeseries_background": {
+                                "yaxis": {
+                                    "include_zero": true
+                                },
+                                "type": "area"
+                            }
+                        },
+                        "layout": {
+                            "x": 9,
+                            "y": 4,
+                            "width": 3,
+                            "height": 3
+                        }
+                    },
+                    {
+                        "id": 7405531483533684,
+                        "definition": {
+                            "title": "Machines by Application Instance Completion Time ",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Every machine that has run the selected application, with instance count, unique users, and average completion time. Use this detailed view to see every machine associated with the selected application.",
+                            "type": "toplist",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "name": "q_completion",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $Machine_Name $User_Name"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "group_by": {
+                                                "fields": [
+                                                    "@cds.citrix_daas.machine.name"
+                                                ],
+                                                "limit": 200,
+                                                "should_exclude_missing": true,
+                                                "sort": {
+                                                    "aggregation": "avg",
+                                                    "metric": "@cds.citrix_daas.application.instance_completion_time",
+                                                    "order": "desc"
+                                                }
+                                            },
+                                            "compute": {
+                                                "aggregation": "avg",
+                                                "metric": "@cds.citrix_daas.application.instance_completion_time"
+                                            },
+                                            "storage": "hot"
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "formulas": [
+                                        {
+                                            "formula": "q_completion",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "second"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "sort": {
+                                        "count": 200,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "style": {
+                                "display": {
+                                    "type": "stacked",
+                                    "legend": "automatic"
+                                }
+                            }
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 7,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 5233800118712895,
+                        "definition": {
+                            "title": "Peak CPU Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Peak CPU trend for the top machines running the selected application.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Peak CPU Usage",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "max",
+                                                    "metric": "@PeakPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "max",
+                                                        "order": "desc",
+                                                        "metric": "@PeakPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "red",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ],
+                            "markers": [
+                                {
+                                    "label": " Saturation ",
+                                    "value": "y = 100",
+                                    "display_type": "error dashed"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 7,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 9500000000000044,
+                        "definition": {
+                            "title": "Avg CPU Utilization Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "CPU utilization trend for the top machines running the selected application.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Avg CPU Usage",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgPercentCpu"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgPercentCpu"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "dog_classic",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ],
+                            "markers": [
+                                {
+                                    "label": " CPU Saturation ",
+                                    "value": "y = 80",
+                                    "display_type": "error dashed"
+                                },
+                                {
+                                    "label": " Underutilized ",
+                                    "value": "y = 20",
+                                    "display_type": "warning dashed"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 11,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 7875385709188847,
+                        "definition": {
+                            "title": "Avg Memory Usage Over Time by Machine",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Used memory as a percentage of total memory over time for the top machines running the selected application.",
+                            "show_legend": true,
+                            "legend_layout": "auto",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "percent"
+                                                }
+                                            },
+                                            "formula": "(q_used / q_total) * 100"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgUsedMemory"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgUsedMemory"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_used",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@AvgTotalMemory"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@AvgUsedMemory"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_total",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "cool",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 15,
+                            "width": 12,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 8762759050459521,
+                        "definition": {
+                            "title": "Average IOPS Over Time",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Trend of average disk input/output operations per second.\n",
+                            "show_legend": true,
+                            "legend_layout": "horizontal",
+                            "legend_columns": [
+                                "avg",
+                                "min",
+                                "max",
+                                "value",
+                                "sum"
+                            ],
+                            "type": "timeseries",
+                            "requests": [
+                                {
+                                    "formulas": [
+                                        {
+                                            "alias": "Average IOPS by Machine",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "operation"
+                                                }
+                                            },
+                                            "formula": "query1"
+                                        }
+                                    ],
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@Iops"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 10,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@Iops"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "query1",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "@cds.citrix_daas.service_name:cds.citrix_daas.machinemetric"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "timeseries",
+                                    "style": {
+                                        "palette": "dog_classic",
+                                        "order_by": "values",
+                                        "line_type": "solid",
+                                        "line_width": "normal"
+                                    },
+                                    "display_type": "line"
+                                }
+                            ]
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 19,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 3293178116459476,
+                        "definition": {
+                            "title": "Top Machines by Disk Latency and IOPs",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Machines with the highest disk latency values.\n",
+                            "type": "query_table",
+                            "requests": [
+                                {
+                                    "queries": [
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@Latency"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 20,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@Latency"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_latency",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "@cds.citrix_daas.service_name:cds.citrix_daas.machinemetric"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 1000,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "avg",
+                                                    "metric": "@Iops"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 20,
+                                                    "sort": {
+                                                        "aggregation": "avg",
+                                                        "order": "desc",
+                                                        "metric": "@Iops"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_avg_iops",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "@cds.citrix_daas.service_name:cds.citrix_daas.machinemetric $Machine_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 10,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "data_source": "aggregate_filtered_query",
+                                            "compute": [
+                                                {
+                                                    "name": "compute_result",
+                                                    "aggregation": "max",
+                                                    "metric": "@Iops"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 20,
+                                                    "should_exclude_missing": true,
+                                                    "sort": {
+                                                        "aggregation": "max",
+                                                        "order": "desc",
+                                                        "metric": "@Iops"
+                                                    }
+                                                }
+                                            ],
+                                            "name": "q_peak_iops",
+                                            "base_query": {
+                                                "name": "base_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "@cds.citrix_daas.service_name:cds.citrix_daas.machinemetric $Machine_Name"
+                                                },
+                                                "indexes": [
+                                                    "*"
+                                                ],
+                                                "storage": "hot"
+                                            },
+                                            "filter_query": {
+                                                "name": "filter_query",
+                                                "data_source": "logs",
+                                                "search": {
+                                                    "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name"
+                                                },
+                                                "indexes": [],
+                                                "storage": "hot",
+                                                "compute": [
+                                                    {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "name": "filter_query_compute"
+                                                    }
+                                                ],
+                                                "group_by": [
+                                                    {
+                                                        "facet": "@cds.citrix_daas.machine.name",
+                                                        "limit": 10,
+                                                        "sort": {
+                                                            "aggregation": "count",
+                                                            "metric": "count",
+                                                            "order": "desc"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "filters": [
+                                                {
+                                                    "base_attribute": "@cds.citrix_daas.machine.name",
+                                                    "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                    "exclude": false
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "response_format": "scalar",
+                                    "sort": {
+                                        "count": 20,
+                                        "order_by": [
+                                            {
+                                                "type": "formula",
+                                                "index": 0,
+                                                "order": "desc"
+                                            }
+                                        ]
+                                    },
+                                    "formulas": [
+                                        {
+                                            "cell_display_mode": "bar",
+                                            "alias": "Avg Latency (ms)",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "millisecond"
+                                                }
+                                            },
+                                            "formula": "q_latency"
+                                        },
+                                        {
+                                            "alias": "Avg IOPS",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "operation"
+                                                }
+                                            },
+                                            "formula": "q_avg_iops"
+                                        },
+                                        {
+                                            "alias": "Peak IOPS",
+                                            "number_format": {
+                                                "unit": {
+                                                    "type": "canonical_unit",
+                                                    "unit_name": "operation"
+                                                }
+                                            },
+                                            "formula": "q_peak_iops"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "has_search_bar": "auto"
+                        },
+                        "layout": {
+                            "x": 6,
+                            "y": 19,
+                            "width": 6,
+                            "height": 4
+                        }
+                    },
+                    {
+                        "id": 4732432990115544,
+                        "definition": {
+                            "title": "Machine Resource Utilization Details",
+                            "title_size": "16",
+                            "title_align": "left",
+                            "description": "Detailed CPU, memory, and logon performance metrics for each machine.\n",
+                            "requests": [
+                                {
+                                    "request_type": "composite_stream",
+                                    "query": {
+                                        "data_source": "list_filtered_query",
+                                        "name": "logs_list_composite_query",
+                                        "base_query": {
+                                            "name": "base_query",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "@cds.citrix_daas.service_name:cds.citrix_daas.resourceutilizationsummary"
+                                            },
+                                            "indexes": [
+                                                "*"
+                                            ],
+                                            "storage": "hot"
+                                        },
+                                        "filter_query": {
+                                            "name": "filter_query",
+                                            "data_source": "logs",
+                                            "search": {
+                                                "query": "source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.applicationinstances $Application_Name $User_Name $Machine_Name"
+                                            },
+                                            "indexes": [],
+                                            "storage": "hot",
+                                            "compute": [
+                                                {
+                                                    "aggregation": "count",
+                                                    "metric": "count",
+                                                    "name": "filter_query_compute"
+                                                }
+                                            ],
+                                            "group_by": [
+                                                {
+                                                    "facet": "@cds.citrix_daas.machine.name",
+                                                    "limit": 1000,
+                                                    "sort": {
+                                                        "aggregation": "count",
+                                                        "metric": "count",
+                                                        "order": "desc"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "filters": [
+                                            {
+                                                "base_attribute": "@cds.citrix_daas.machine.name",
+                                                "filter_attribute": "@cds.citrix_daas.machine.name",
+                                                "exclude": false
+                                            }
+                                        ]
+                                    },
+                                    "columns": [
+                                        {
+                                            "field": "timestamp",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.machine.name",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "@cds.citrix_daas.machine.ip",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "AvgPercentCpu",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "PeakPercentCpu",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "AvgUsedMemory",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "PeakUsedMemory",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "AvgTotalMemory",
+                                            "width": "auto"
+                                        },
+                                        {
+                                            "field": "AvgLogOnDurationInMs",
+                                            "width": "auto"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "type": "list_stream"
+                        },
+                        "layout": {
+                            "x": 0,
+                            "y": 23,
+                            "width": 12,
+                            "height": 4
+                        }
+                    }
+                ]
+            },
+            "layout": {
+                "x": 0,
+                "y": 20,
+                "width": 12,
+                "height": 28,
+                "is_column_break": true
+            }
+        }
+    ],
+    "template_variables": [
+        {
+            "name": "Application_Name",
+            "prefix": "@cds.citrix_daas.application.name",
+            "available_values": [],
+            "default": "*"
+        },
+        {
+            "name": "Machine_Name",
+            "prefix": "@cds.citrix_daas.machine.name",
+            "available_values": [],
+            "default": "*"
+        },
+        {
+            "name": "User_Name",
+            "prefix": "@usr.name",
+            "available_values": [],
+            "default": "*"
+        }
+    ],
+    "layout_type": "ordered",
+    "notify_list": [],
+    "reflow_type": "fixed"
+}

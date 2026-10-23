@@ -1,0 +1,26 @@
+{
+    "id": 333269937,
+    "name": "Authentication duration exceeds 10,000 ms in Citrix DaaS",
+    "type": "log alert",
+    "query": "logs(\"source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.connections\").index(\"*\").rollup(\"avg\", \"@AuthenticationDuration\").last(\"15m\") > 10000",
+    "message": "The average authentication for the connection **{{log.attributes.cds.citrix_daas.machine.name}}** has exceeded the configured threshold of **{{threshold}}** ms.\r\n\r\n**Connection Details**\r\n\r\n- **Connection Id**: {{log.attributes.cds.citrix_daas.connection.id}}\r\n- **Machine Name**: {{log.attributes.cds.citrix_daas.machine.name}}\r\n- **Machine IP**: {{log.attributes.cds.citrix_daas.machine.ip}}\r\n- **Authentication Duration**: {{log.attributes.AuthenticationDuration}}\r\n- **Created Time**: {{log.attributes.CreatedDate}}\r\n\r\nSustained high authentication duration may impact performance, application responsiveness, and user session stability.",
+    "tags": [
+        "integration:crest-data-systems-citrix-daas",
+        "stack_component:cds.citrix_daas.connections"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 10000,
+            "warning": 5000
+        },
+        "enable_logs_sample": false,
+        "notify_audit": false,
+        "on_missing_data": "default",
+        "include_tags": false,
+        "groupby_simple_monitor": false,
+        "new_host_delay": 300
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

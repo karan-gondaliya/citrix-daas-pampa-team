@@ -1,0 +1,26 @@
+{
+    "id": 333268193,
+    "name": "Detected more than 10 anonymous sessions in Citrix DaaS",
+    "type": "log alert",
+    "query": "logs(\"source:crest_data_systems_citrix_daas @cds.citrix_daas.service_name:cds.citrix_daas.sessions @IsAnonymous:true\").index(\"*\").rollup(\"count\").by(\"@cds.citrix_daas.desktop_group.name\").last(\"1h\") > 10",
+    "message": "The number of anonymous sessions for the desktop group **{{log.attributes.cds.citrix_daas.desktop_group.name}}** has exceeded the configured threshold of **{{threshold}}** in the past 1 hour.\r\n\r\n**Session Details**\r\n\r\n- **Desktop Group**: {{log.attributes.cds.citrix_daas.desktop_group.name}}\r\n- **Session Key**: {{log.attributes.cds.citrix_daas.session.key}}\r\n- **Machine Name**: {{log.attributes.cds.citrix_daas.machine.name}}\r\n- **User**: {{log.attributes.usr.name}}\r\n\r\nA high number of anonymous sessions may indicate unauthorized access attempts or misconfigured authentication settings. Please investigate the desktop group for potential security or unauthorized access issues.",
+    "tags": [
+        "integration:crest-data-systems-citrix-daas",
+        "stack_component:cds.citrix_daas.sessions"
+    ],
+    "options": {
+        "thresholds": {
+            "critical": 10,
+            "warning": 5
+        },
+        "enable_logs_sample": true,
+        "notify_audit": false,
+        "on_missing_data": "default",
+        "include_tags": true,
+        "new_group_delay": 60,
+        "groupby_simple_monitor": false
+    },
+    "priority": null,
+    "draft_status": "published",
+    "assets": []
+}

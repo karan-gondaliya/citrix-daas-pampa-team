@@ -1,0 +1,76 @@
+================================================================================
+  IMPORT CITRIX DAAS MONITORS
+  Crest Data Systems -- Citrix DaaS Custom Build
+================================================================================
+
+MONITOR FILES INCLUDED
+-------------------------
+  1. machine_logonduration_exceeding_1_minute_in_citrix_daas.json
+       -> Machine LogOnDuration Exceeding 1 minute in Citrix DaaS
+
+  2. machine_cpu_utilization_exceeds_90%.json
+       -> Machine CPU utilization exceeds 90%
+
+  3. machine_memory_utilization_exceeding_15000_in_citrix_daas.json
+       -> Machine Memory Utilization Exceeding 15000 in Citrix DaaS
+
+  4. machine_latency_exceeding_5_seconds_in_citrix_daas.json
+       -> Machine Latency Exceeding 5 Seconds in Citrix DaaS
+
+  5. session_failure_detected_in_citrix_daas.json
+       -> Session Failure Detected in Citrix DaaS
+
+  6. connection_failure_detected_in_citrix_daas.json
+       -> Connection Failure Detected in Citrix DaaS
+
+  7. more_than_10_unencrypted_ica_connections_detected_in_citrix_daas.json
+       -> More than 10 unencrypted ICA connections detected in Citrix DaaS
+
+  8. authentication_duration_exceeds_10,000_ms_in_citrix_daas.json
+       -> Authentication duration exceeds 10,000 ms in Citrix DaaS
+
+  9. detected_more_than_10_anonymous_sessions_in_citrix_daas.json
+       -> Detected more than 10 anonymous sessions in Citrix DaaS
+
+--------------------------------------------------------------------------------
+
+STEP 1 -- Log In to Datadog
+-----------------------------
+  Log in to your Datadog account.
+
+
+STEP 2 -- Navigate to Monitors
+---------------------------------
+  From the left-hand menu, navigate to Monitoring -> Monitors -> New Monitor.
+  (Or go directly to: Monitors -> New Monitor)
+
+
+STEP 3 -- Click "Import From JSON"
+-------------------------------------
+  On the New Monitor page, click the "Import From JSON" button in the
+  top-right corner.
+
+
+STEP 4 -- Paste the Monitor JSON
+------------------------------------
+  1. Open the desired JSON file, copy its full contents.
+  2. Paste the contents into the "Paste your JSON monitor definition" box.
+
+
+STEP 5 -- Save the Monitor
+------------------------------
+  Click "Save" to create the imported monitor.
+
+
+STEP 6 -- Repeat for Each Monitor
+-------------------------------------
+  Repeat Steps 2 to 5 for each of the nine JSON files listed above.
+
+--------------------------------------------------------------------------------
+
+NOTE
+----
+  Make sure your Datadog account has the necessary permissions to create
+  and edit monitors.
+
+================================================================================

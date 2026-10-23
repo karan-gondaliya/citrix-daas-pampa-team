@@ -1,0 +1,66 @@
+================================================================================
+  IMPORT CITRIX DAAS DASHBOARDS
+  Crest Data Systems -- Citrix DaaS Custom Build
+================================================================================
+
+DASHBOARD FILES INCLUDED
+-------------------------
+  1. crest_data_systems_citrix_daas_application_and _machine_Performance.json
+       -> Citrix DaaS - Application and Machine Performance
+
+  2. crest_data_systems_citrix_daas_sessions_and_connections.json
+       -> Citrix DaaS - Connection & Sessions
+
+--------------------------------------------------------------------------------
+
+STEP 1 -- Log In to Datadog
+-----------------------------
+  Log in to your Datadog account.
+
+
+STEP 2 -- Navigate to Dashboards
+----------------------------------
+  From the left-hand menu, navigate to Dashboards.
+
+
+STEP 3 -- Create a New Dashboard
+----------------------------------
+  Click the "New Dashboard" button in the top-right corner.
+
+
+STEP 4 -- Click on Blank Dashboard
+------------------------------------
+  Select "Blank Dashboard" from the options shown.
+
+
+STEP 5 -- Open Settings
+------------------------
+  Inside the new dashboard, click the gear icon (Settings) in the
+  top-right corner of the editor.
+
+
+STEP 6 -- Import Dashboard JSON
+--------------------------------
+  1. Select "Import dashboard JSON".
+  2. Open the desired JSON file, copy its full contents.
+  3. Paste the contents into the import dialog.
+  4. Click "Yes, Replace".
+
+
+STEP 7 -- Save the Dashboard
+------------------------------
+  Click "Save Changes" to save the imported dashboard.
+
+
+STEP 8 -- Repeat for Each Dashboard
+-------------------------------------
+  Repeat Steps 3 to 7 for each of the two JSON files provided.
+
+--------------------------------------------------------------------------------
+
+NOTE
+----
+  Make sure your Datadog account has the necessary permissions to create
+  and edit dashboards.
+
+================================================================================
